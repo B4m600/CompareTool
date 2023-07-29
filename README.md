@@ -1,1 +1,1 @@
-<a href="Compare.html">Compare.html</a>
+<a href="Compare.md">Compare</a>
