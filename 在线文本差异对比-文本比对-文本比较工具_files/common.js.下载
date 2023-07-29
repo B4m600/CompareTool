@@ -1,0 +1,430 @@
+var serviceUrl = "http://api.100xgj.com";
+//收藏
+function collectTools(e, url) {
+    $.ajax({
+        type: "post",
+        url: serviceUrl+"/ajax/collect",
+        data: {tool_url: url, sort: 0},
+        dataType: 'json',
+        headers: {
+            'Authorization': token
+        },
+        success: function (result) {
+            if (result.code == 1) {
+                $(e).text('已收藏');
+            } else if (result.code == 2) {
+                $(e).text('收藏');
+            } else if (result.code == 0) {
+                // alert(result.msg);
+                layer.msg(result.msg);
+            }
+        },
+        error: function () {
+        }
+    });
+}
+//加入收藏 
+function AddFavorite() {
+
+       addToBookMark(window.location.href, document.title);
+}
+
+function addToBookMark(url, title) {
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.indexOf("msie 8") > -1) {
+        external.AddToFavoritesBar(url, title);//IE8 
+    } else {
+        try {
+            window.external.addFavorite(url, title);
+        } catch (e) {
+            try {
+                window.sidebar.addPanel(title, url);//firefox 
+            } catch (e) {
+                alert("加入收藏失败，请使用Ctrl+D进行添加");
+            }
+        }
+    }
+    return false;
+
+
+}
+
+function MyTools() {
+    $.ajax({
+        type: "get",
+        url: serviceUrl+"/ajax/collectOut",
+        data: {},
+        dataType: 'html',
+        headers: {
+            'Authorization': token
+        },
+        success: function (result) {
+            if (result.length > 0) {
+                $('#MyTools').html(result);
+            } else {
+                $('#MyTools').html('');
+            }
+        }
+    });
+}
+
+
+var ua = navigator.userAgent;
+var ipad = ua.match(/(iPad).*OS\s([\d_]+)/),
+    isIphone = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/),
+    isAndroid = ua.match(/(Android)\s+([\d.]+)/),
+    isMobile = isIphone || isAndroid;
+
+
+if (typeof (layer) == "undefined") {
+    document.write('<script src="/static/js/layer.js" type="text/javascript"  async="async"><\/script>');
+}
+if (window.location.href == 'http://www.100xjg.com/') {
+    window.location.href = 'https://www.100xjg.com/';
+}
+var index_background_image = "", index_background_on = 0, index_search = 0, index_tab_type = $("#index_search_div").find('.show_index_tab li[class=active]').find('a').attr('data-val'), self_word_list = 0, index_background_css = '', index_search_div = localStorage.getItem('index_search_div');
+
+
+$(function () {
+    $.ajax({
+        type: "get",
+        url: serviceUrl + "/ajax/userSetting",
+        data: {},
+        dataType: 'json',
+        headers: {
+            'Authorization': token
+        },
+        success: function (result) {
+            if (result.code == 0) {
+                index_background_image = "";
+                index_background_on = 1;
+                index_search = 1;
+                self_word_list = 0;
+                index_background_css = '';
+                // $('#user-ul').html("<li><a href=\"/User/Init/Login.html\" rel=\"nofollow\">登录</a></li>\n" +
+                //     "                    <li><a href=\"/User/Init/Register.html\" rel=\"nofollow\">注册</a></li>  ");
+                $('#user-ul').html("  <li role=\"presentation\" class=\"dropdown\">\n" +
+                    "                        <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\" role=\"button\"  aria-expanded=\"false\" aria-haspopup=\"true\">用户中心<span class=\"caret\"></span>\n" +
+                    "                        </a>\n" +
+                    "                        <ul class=\"dropdown-menu\">\n" +
+                    //"                            <li><a href=\"//user.100xgj.com/login\">登录</a></li>\n" +
+                    //"                            <li><a href=\"//user.100xgj.com/register\">注册</a></li>\n" +
+                     "                            <li><a href=\"javascript:alert('暂未开放登录')\">登录</a></li>\n" +
+                    "                            <li><a href=\"javascript:alert('暂未开放注册')\">注册</a></li>\n" +
+                    "                        </ul>\n" +
+                    "                    </li>\n");
+            } else {
+                index_background_image = result.data['image'];
+                index_background_on = result.data['background'];
+                index_search = result.data['index_search'];
+                self_word_list = result.data['self_word_list'];
+                index_background_css = result.data['index_background_css'];
+                $('#user-ul').html("  <li role=\"presentation\" class=\"dropdown\">\n" +
+                    "                        <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\" role=\"button\"  aria-expanded=\"false\" aria-haspopup=\"true\">" + result.data['user_name'] + "<span class=\"caret\"></span>\n" +
+                    "                        </a>\n" +
+                    "                        <ul class=\"dropdown-menu\">\n" +
+                    "                            <li><a href=\"//user.100xgj.com/profile\">用户中心</a></li>\n" +
+                    "                            <li><a href=\"//user.100xgj.com/charge\">账户冲值</a></li>\n" +
+                    "                            <li><a href=\"//user.100xgj.com/convListAll\">转换记录</a></li>\n" +
+                    "                            <li><a href=\"//user.100xgj.com/payList\">付费记录</a></li>\n" +
+                    "                            <li><a href=\"//user.100xgj.com/resetPass\">修改密码 </a></li>\n" +
+                    "                            <li><a href=\"//user.100xgj.com/logout\">退出</a></li>\n" +
+                    "                        </ul>\n" +
+                    "                    </li>\n");
+            }
+            if ($('#tools_main').length <= 0) {
+                return;
+            }
+            if (result.data == null) {
+                // return;
+            }
+           
+        }
+    });
+
+    //顶部搜索
+    $("#search").autocomplete({
+        source: serviceUrl + "/ajax/inputSearch",
+        select: function (event, ui) {
+            var command = ui.item['value'];
+            $.ajax({
+                type: "get",
+                url: serviceUrl + "/ajax/ajaxToolsUrl",
+                data: {name: command},
+                dataType: 'json',
+                success: function (result) {
+                    console.log(result);
+                    if (result.code == 1) {
+                        window.location = result.data['url'];
+                    }
+                }
+            });
+        }
+    });
+});
+
+
+
+/**
+ * 打赏
+ */
+function dashang() {
+    layer.open({
+        area: ['430px', '260px'],
+        type: 1,
+        title: "<?php echo langText('打赏我们，我们可以做的更多&更好。');?>",
+        skin: 'layui-layer-demo',
+        closeBtn: 0,
+        anim: 2,
+        shadeClose: true,
+        content: '<a href=\'/Home/Index/dashang.html\' target="_blank"><img src="/Public/dashang.png" alt="打赏我们" title="打赏我们"></a>\n'
+    });
+}
+
+/**
+ * 打开
+ */
+function openNavAd() {
+    layer.open({
+        area: ['260px', '260px'],
+        type: 1,
+        title: "关注公众号反馈与建议",
+        skin: 'layui-layer-demo',
+        closeBtn: 0,
+        anim: 2,
+        shadeClose: true,
+        content: '<div class="col-lg-12 col-xs-12" style="text-align: center;"><img src="/Public/images/push/wx.jpg" style="width: 200px;"></div>',
+    });
+}
+
+/**kami**/
+/**
+ * 充值
+ */
+function topup() {
+    layer.open({
+        area: ['450px', '320px'],
+        type: 1,
+        title: "充值提示",
+        skin: 'layui-layer-demo',
+        closeBtn: 0,
+        anim: 2,
+        shadeClose: true,
+        content: '<div class="col-lg-12">' +
+            '<h2 style="text-align: center;margin-top: 12px;margin-bottom: 5px;">' +
+            '<a href="https://w.url.cn/s/AQKH9NL" target="_blank" rel="nofollow">卡密充值</a>' +
+            '</h2>' +
+            '<div class="col-lg-12 col-xs-12 top15" style="text-align: center;"><div class="col-lg-12 col-xs-12 top15"><label class="control-label">卡号</label><input type="text" id="kami_code" class="form-control kami-input"></div><div class="col-lg-12 col-xs-12 top15"><label class="control-label">卡密</label><input type="text" id="kami_key" class="form-control kami-input"></div><div class="col-lg-12 col-xs-12 top15"><input type="button" class="btn btn-primary" value="验证卡密" onclick="kami()"> or <a href="https://w.url.cn/s/AQKH9NL" target="_blank" rel="nofollow" class="btn btn-primary">购买卡密</a></div><div class="col-lg-12 col-xs-12 top15"><span>卡密1元=1金币 验证出现问题加群联系管理或联系QQ:766675670</span></div>' +
+            '</div>' +
+            '</div>',
+    });
+}
+
+/**
+ * 验证卡密
+ */
+function kami() {
+    var code = $('#kami_code').val(), key = $('#kami_key').val();
+    $.ajax({
+        type: "post",
+        url: "/user/kami.html",
+        data: {code: code, key: key},
+        dataType: 'json',
+        success: function (result) {
+            if (result.code != 1) {
+                layer.msg(result.msg);
+                return;
+            }
+            layer.msg(result.msg, function () {
+                window.location = '';
+            })
+        }, error: function () {
+            layer.msg('卡密验证出错，请联系管理员核对!');
+        }
+    });
+}
+
+/**kami**/
+
+/**tool_pay**/
+function tool_pay(e) {
+    var tool_id = $(e).attr('data-id'), title = $(e).attr('data-title'), money = $(e).attr('data-money'), user_money = $(e).attr('data-user-money'), end_time = $(e).attr('data-end-time');
+    layer.open({
+        area: ['450px', '360px'],
+        type: 1,
+        title: "支付工具",
+        skin: 'layui-layer-demo',
+        closeBtn: 0,
+        anim: 2,
+        shadeClose: true,
+        content: '<div class="col-lg-12">' +
+            '<h2 style="text-align: center;margin-top: 12px;margin-bottom: 5px;">' +
+            '' + title + '(' + money + '金币/天)' +
+            '</h2>' +
+            '<div class="col-lg-12 col-xs-12 top15" style="text-align: center;"><div class="col-lg-12 col-xs-12 top15"><label class="control-label">数量</label><select class="form-control pay_number" style="    width: 200px;display: inline-block;"><option value="1">1天</option><option value="2">2天</option><option value="3">3天</option><option value="4">4天</option><option value="5">5天</option></select></div><div class="col-lg-12 col-xs-12 top15"><label class="control-label">金币</label><input type="text" id="" class="form-control kami-input" disabled value="' + user_money + '" style="width: 200px;display: inline-block;"></div><div class="col-lg-12 col-xs-12 top15"><label class="control-label">有效</label><input type="text" id="" class="form-control kami-input" disabled value="' + end_time + '" style="width: 200px;display: inline-block;"></div><div class="col-lg-12 col-xs-12 top15"><input type="button" class="btn btn-primary" value="立刻支付" onclick="tool_pay_send(this)" data-id="' + tool_id + '"> or <input type="button" onclick="topup()"  class="btn btn-primary" value="充值金币" ></div><div class="col-lg-12 col-xs-12 top15"><span>卡密1元=1金币 验证出现问题加群联系管理或联系QQ:766675670</span></div>' +
+            '</div>' +
+            '</div>',
+    });
+}
+
+function tool_pay_send(e) {
+    var tool_id = $(e).attr('data-id'), number = $(e).parent().parent().find('.pay_number').val();
+    if (!confirm('确定支付?')) {
+        return;
+    }
+    $.ajax({
+        type: "post",
+        url: "/user/tool_pay.html",
+        data: {tool_id: tool_id, use_pay_tool: 'pay', use_pay_tool_number: number},
+        dataType: 'json',
+        success: function (result) {
+            if (result.code != 1) {
+                layer.msg(result.msg);
+                return;
+            }
+            layer.msg(result.msg, function () {
+                window.location = '';
+            })
+        }, error: function () {
+            layer.msg('请联系管理员核对!');
+        }
+    });
+}
+
+/**tool_pay**/
+
+
+/**重写ajax**/
+jQuery(function ($) {
+// 备份jquery的ajax方法
+    var _ajax = $.ajax;
+// 重写ajax方法，先判断登录在执行success函数
+    $.ajax = function (opt) {
+        var _opt = $.extend(opt, {
+            //xhrFields: {
+            //    withCredentials: true
+            //},
+            beforeSend: function (xhr) {
+                let userToken = $('#userToken').val();
+                if (userToken == undefined) {
+                    userToken = '';
+                }            
+                xhr.setRequestHeader('Authorization', userToken);
+
+            },
+        });
+        return _ajax(_opt);
+    };
+});
+
+//格式化金额 使用方式 number_format(m, 2, '.', ',')
+function number_format(number, decimals, dec_point, thousands_sep, roundtag) {
+    /*
+    * 参数说明：
+    * number：要格式化的数字
+    * decimals：保留几位小数
+    * dec_point：小数点符号
+    * thousands_sep：千分位符号
+    * roundtag:舍入参数，默认 "ceil" 向上取,"floor"向下取,"round" 四舍五入
+    * */
+    number = (number + '').replace(/[^0-9+-Ee.]/g, '');
+    roundtag = roundtag || "ceil"; //"ceil","floor","round"
+    var n = !isFinite(+number) ? 0 : +number,
+        prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+        sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+        dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+        s = '',
+        toFixedFix = function (n, prec) {
+
+            var k = Math.pow(10, prec);
+            console.log();
+
+            return '' + parseFloat(Math[roundtag](parseFloat((n * k).toFixed(prec * 2))).toFixed(prec * 2)) / k;
+        };
+    s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+    var re = /(-?\d+)(\d{3})/;
+    while (re.test(s[0])) {
+        s[0] = s[0].replace(re, "$1" + sep + "$2");
+    }
+
+    if ((s[1] || '').length < prec) {
+        s[1] = s[1] || '';
+        s[1] += new Array(prec - s[1].length + 1).join('0');
+    }
+    return s.join(dec);
+}
+
+(function (a) {
+    if (typeof c === "undefined") {
+        var c = {}
+    }
+    c.output = {
+        isAdClearArea: false,
+        tool_Navinfo: function () {
+
+            document.write(" <div class=\"hidden-xs alipayInfo\" style=\"float: left;margin-top: 5px;margin-left: 10px;border-left: 1px solid #ececec;padding-left: 5px;\">");
+            document.write("<a href=\"javascript:void()\" style=\"color:#ff0000; font-weight: bold; font-size: 15px; \" title=\"\u652f\u4ed8\u5b9d\u626b\u7801\u9886\u7ea2\u5305\">\u652f\u4ed8\u5b9d\u7ea2\u5305<\/a>");
+            document.write("<\/div>");
+            document.write("<div class=\"hidden-xs\" style=\"float: left;margin-top: 5px;margin-left: 10px;border-left: 1px solid #ececec;padding-left: 5px;\">");
+            document.write("<a href=\"\/\/tool.100xgj.com\/info\/2\" target=\"_blank\" style=\"color:#5781d2; font-weight: bold; font-size: 15px; \" title=\"\u4eac\u4e1c6.18\u5927\u4fc3\">\u4eac\u4e1c618\u5927\u4fc3\u4e3b\u4f1a\u573a<\/a>");
+            document.write("<\/div>");
+            document.write("<div class=\"hidden-xs\" style=\"float: left;margin-top: 5px;margin-left: 10px;border-left: 1px solid #ececec;padding-left: 5px;\">");
+            document.write("<a href=\"\/\/tool.100xgj.com\/info\/1\" target=\"_blank\" style=\"color:#9425b0; font-weight: bold; font-size: 15px; \" title=\"\u73a9\u6e38\u620f\u8f7b\u677e\u8d5a\u94b1\">\u73a9\u6e38\u620f\u8f7b\u677e\u8d5a\u94b1<\/a>");
+            document.write("<\/div>");
+            document.write("<div class=\"hidden-xs\" style=\"float: left;margin-top: 5px;margin-left: 10px;border-left: 1px solid #ececec;padding-left: 5px;\">");
+            document.write("<a href=\"\/\/tool.100xgj.com\/info\/6\" target=\"_blank\" style=\"color:#d713d7; font-weight: bold; font-size: 15px; \" title=\"\u5929\u732b\u9650\u65f6\u6298\u6263\">\u5929\u732b\u9650\u65f6\u6298\u6263<\/a>");
+            document.write("<\/div>");
+
+        },
+        footer_Navinfo: function () {
+
+            document.write("<script async src=\"https:\/\/pagead2.googlesyndication.com\/pagead\/js\/adsbygoogle.js?client=ca-pub-6426955822273233\"");
+            document.write("     crossorigin=\"anonymous\"><\/script>");
+            document.write("<ins class=\"adsbygoogle\"");
+            document.write("     style=\"display:block\"");
+            document.write("     data-ad-client=\"ca-pub-6426955822273233\"");
+            document.write("     data-ad-slot=\"4441033539\"");
+            document.write("     data-ad-format=\"auto\"");
+            document.write("     data-full-width-responsive=\"true\"><\/ins>");
+            document.write("<script>");
+            document.write("     (adsbygoogle = window.adsbygoogle || []).push({});");
+            document.write("<\/script>");
+
+        },
+        search_Navinfo: function () {
+
+            document.write("<script async src=\"https:\/\/pagead2.googlesyndication.com\/pagead\/js\/adsbygoogle.js?client=ca-pub-6426955822273233\"");
+            document.write("     crossorigin=\"anonymous\"><\/script>");
+            document.write("<ins class=\"adsbygoogle\"");
+            document.write("     style=\"display:inline-block;width:970px;height:90px\"");
+            document.write("     data-ad-client=\"ca-pub-6426955822273233\"");
+            document.write("     data-ad-slot=\"3624088963\"><\/ins>");
+            document.write("<script>");
+            document.write("     (adsbygoogle = window.adsbygoogle || []).push({});");
+            document.write("<\/script>");
+
+
+        }
+    };
+    window.xgj100 = c;
+
+}
+)(window);
+
+
+$(function () {
+    $(".alipayInfo").click(function () {
+        layer.open({
+            type: 1,
+            area: ['380px', '650px'],
+            offset: '200px',
+            title: '支付宝扫码领红包',
+            shade: 0.6,
+            shadeClose: true,
+            maxmin: true,
+            anim: 0,
+            content: '<div style="margin: 10px; color: #666464; font-size: 0.1rem"><img src="/info/img/5bab10f56991d3511f069a4d5bd0fef.jpg" alt="支付宝红包" style="height: 500px; width: 350px; margin-bottom: 10px"><div >支付宝官方活动，保存图片每天都能扫码一次</div><div>1. 使用支付宝APP扫一扫，领取红包。</div><div>2. 谢谢大家支持网站的可持续发展。</div></div>'
+        });
+    });
+
+});

@@ -1,0 +1,19 @@
+﻿var tongjiid = '908c62fb1206237e8802c8df0b113eb4';
+tongjiid = 'ZDVlZDJjZGQzYTc3Yjc0YzJjZDQ1N2RlNjI4ZjQ2ZjA=';
+var tongjiidCode = atob(tongjiid);
+
+document.writeln("<div style=\"display:none\">");
+document.writeln("    <script>");
+document.writeln("        var _hmt = _hmt || [];");
+document.writeln("        (function () {");
+document.writeln("            var hm = document.createElement(\"script\");");
+document.writeln("            hm.src = \"https://hm.baidu.com/hm.js?" + tongjiidCode +"\";");
+document.writeln("            var s = document.getElementsByTagName(\"script\")[0];");
+document.writeln("            s.parentNode.insertBefore(hm, s);");
+document.writeln("        })();");
+document.writeln("    </script>");
+document.writeln("");
+document.writeln("    <script>");
+document.writeln("        !function (p) { \"use strict\"; !function (t) { var s = window, e = document, i = p, c = \"\".concat(\"https:\" === e.location.protocol ? \"https://\" : \"http://\", \"sdk.51.la/js-sdk-pro.min.js\"), n = e.createElement(\"script\"), r = e.getElementsByTagName(\"script\")[0]; n.type = \"text/javascript\", n.setAttribute(\"charset\", \"UTF-8\"), n.async = !0, n.src = c, n.id = \"LA_COLLECT\", i.d = n; var o = function () { s.LA.ids.push(i) }; s.LA ? s.LA.ids && o() : (s.LA = p, s.LA.ids = [], o()), r.parentNode.insertBefore(n, r) }() }({ id: \"JxeqMceWuSyfFR5w\", ck: \"JxeqMceWuSyfFR5w\" });");
+document.writeln("    </script>");
+document.writeln("</div>");

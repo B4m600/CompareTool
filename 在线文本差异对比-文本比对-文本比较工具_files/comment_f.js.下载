@@ -1,0 +1,39 @@
+function validateComment(txaArticle) {
+    if (txaArticle == '') {
+        layer.msg('填入信息为空，请重新输入!');
+        return false;
+    }
+    return true;
+
+}
+
+// 提交评论
+$('#j-post').on('click', function () {
+    var txaArticle = $('#txaArticle').val();
+    var url = $('#txturl').val();
+    if (validateComment(txaArticle)) {
+        $.ajax({
+            type: "POST",
+            url: comment_url,
+            data: {
+                content: txaArticle,
+                feedbackType: feedbackType,
+                url:url
+            },
+            dataType: "json",
+            success: function (data) {
+                if (data.code == 1) {
+                    layer.msg(data.msg, function () {
+                        window.location = '';
+                    });
+                } else {
+                    layer.msg(data.msg);
+                }
+            },
+            error: function (message) {
+            }
+        });
+    }
+    return false;
+
+})

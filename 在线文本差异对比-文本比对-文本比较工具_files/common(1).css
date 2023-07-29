@@ -1,0 +1,54 @@
+﻿.table td, .table th {
+    border: 1px solid #e2e2e2 !important;
+}
+
+.tabnote {
+    padding: 15px 20px;
+    background: #f7f7f7;
+}
+
+.tabinfo {
+    height: 50px;
+    border-bottom: solid 1px #e5e5e5;
+    width:98%;
+    margin-left:15px;
+    
+}
+
+    .tabinfo h3 {
+        font: 22px "微软雅黑","Microsoft YaHei";
+        color: #333;
+        border-left: 3px solid #337ab7;
+        padding-left: 12px;
+        line-height: 34px;
+        width:100%;
+        
+    }
+
+.tabinfonote {
+    padding: 5px 0;
+}
+
+    .tabinfonote .pinfo {
+        padding: 10px 20px 10px 20px;
+        text-align: left;
+        font-size: 14px;
+        line-height: 24px;
+    }
+    .tabinfonote .pinfo p {
+        
+        text-indent: 2em;
+    }
+
+fieldset {
+    padding: .35em .625em .75em;
+    margin: 0 2px;
+    border: 1px solid silver;
+}
+
+legend {
+    padding: .5em;
+    border: 0;
+    width: auto;
+    margin-bottom: 0px;
+}
