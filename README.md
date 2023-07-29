@@ -1,1 +1,0 @@
-<a href="Compare.md">Compare</a>
